@@ -3,7 +3,7 @@
 
 using namespace std;
 
-#define vr 13
+#define vr 12
 
 int *permutationArray; 
 long lastRow = 0;
@@ -189,8 +189,10 @@ int main()
 	// 	}
 	// 	cout << endl;
 	// }
-
+	t_s = omp_get_wtime();		
 	generatePermutationArray(origin);
+	t_s = omp_get_wtime() - t_s;
+
 
 	// for (int i = 0; i <  numPerm; i++) {
 	// 	for (int j = 0; j < vr-1; j++) {
@@ -210,7 +212,7 @@ int main()
 		TSP_Parallel(graph, origin, numThreads);	
 		t_p2 = omp_get_wtime() - t_p2;
 		// cout << "t_p=" << t_p << endl;
-		cout << vr << " " << numThreads << " " << t_p << " " << t_p2 << endl;
+		cout << vr << " " << numThreads << " " << t_s << " " << t_p << " " << t_p2 << endl;
 	}
 
 	return 0;

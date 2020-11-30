@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#define vr 10
+#define vr 13
 
 int *permutationArray; 
 long lastRow = 0;
@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
 	int origin = 0, id, procCount, blockSize, minPath, tmpMin;
 	unsigned long long int idx = 0;
 
-	double time, time2;
+	double time, time2, time3;
 
 	MPI_Status status;
 
@@ -234,7 +234,9 @@ int main(int argc, char *argv[])
 		// 	cout << endl;
 		// }
 
+		time3 = MPI_Wtime();
 		generatePermutationArray(origin);
+		time3  = MPI_Wtime() - time3;
 		// for (int i = 0; i <  numPerm; i++) {
 		// 	for (int j = 0; j < vr-1; j++) {
 		// 		printf("%d ", *(permutationArray + i*(vr-1) + j)); 
@@ -242,9 +244,9 @@ int main(int argc, char *argv[])
 		// 	cout << endl;
 		// }
 
-		time = MPI_Wtime();
-		TSP_Sequential(graph, origin);	
-		time  = MPI_Wtime() - time;
+		// time = MPI_Wtime();
+		// TSP_Sequential(graph, origin);	
+		// time  = MPI_Wtime() - time;
 		// cout << "t_s: " << time << endl;
 		// cout << endl;
 
@@ -293,7 +295,7 @@ int main(int argc, char *argv[])
     	// cout << "Parallel Result is: " << minPath << endl;
 		time2  = MPI_Wtime() - time2;
 		// cout << "t_p: " << time2 << endl;
-		cout << vr << " " << procCount << " " << time << " " << time2 << endl;
+		cout << vr << " " << procCount << " " << time3 << " " << time << " " << time2 << endl;
     }
 
 	// cleanup 

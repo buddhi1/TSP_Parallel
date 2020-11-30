@@ -3,7 +3,7 @@
 
 using namespace std;
 
-#define vr 12
+#define vr 5
 
 int *permutationArray; 
 long lastRow = 0;
@@ -109,7 +109,7 @@ int TSP(int grph[][vr], int p) // implement traveling Salesman Problem.
 	}
 	while (next_permutation(ver.begin(), ver.end()));
 
-	cout << "TSP1: " << cd << endl;
+	cout << "TSP Sequential: " << cd << endl;
 	return m_p;
 }
 
@@ -127,28 +127,31 @@ int TSP3(int graph[][vr], int p) // implement traveling Salesman Problem.
 	}
 	int m_p = INT_MAX; // store minimum weight of a graph
 
-	do 
+	omp_set_num_threads(8);
+	#pragma omp parallel shared(graph, ver)
 	{
-		cd++;
-		int cur_pth = 0;
-		int k = p;
+		do 
+		{
+			cd++;
+			int cur_pth = 0;
+			int k = p;
 
-		#pragma omp parallel for reduction(+: cur_pth)
-		for (i = 0; i < vr-1; i++) {
-			if (i == 0)
-			{				
-				cur_pth += graph[0][ver[i]];
-			} else {
-				cur_pth += graph[ver[i-1]][ver[i]];
+			// #pragma omp parallel for reduction(+: cur_pth)
+			for (i = 0; i < vr-1; i++) {
+				if (i == 0)
+				{				
+					cur_pth += graph[0][ver[i]];
+				} else {
+					cur_pth += graph[ver[i-1]][ver[i]];
+				}
 			}
+			cur_pth += graph[ver[ver.size()-1]][p];
+
+			m_p = min(m_p, cur_pth); // to update the value of minimum weight
 		}
-		cur_pth += graph[ver[ver.size()-1]][p];
-
-		m_p = min(m_p, cur_pth); // to update the value of minimum weight
+		while (next_permutation(ver.begin(), ver.end()));
 	}
-	while (next_permutation(ver.begin(), ver.end()));
-
-	cout << "TSP1: " << cd << endl;
+	cout << "TSP33333: " << cd << endl;
 	return m_p;
 }
 
@@ -182,17 +185,17 @@ int TSP2(int graph[][vr], int p) // implement traveling Salesman Problem.
 {
 	int m_p = INT_MAX; // store minimum weight of a graph 
 
-	// #pragma omp parallel for shared(graph)
+	#pragma omp parallel for shared(graph)
 	for (long permId = 0; permId < numPerm; ++permId)
 	{
 		int cur_pth = 0;
 		int k = p;
 		int i;
 
-		#pragma omp parallel
+		// #pragma omp parallel
 		{
 
-			#pragma omp for reduction(+: cur_pth)
+			// #pragma omp for reduction(+: cur_pth)
 			for (i = 0; i < vr-1; i++) {
 				if (i == 0)
 				{				
@@ -289,12 +292,12 @@ int main()
 
 	generatePermutationArray(p);
 
-	// for (int i = 0; i <  numPerm; i++) {
-	// 	for (int j = 0; j < vr-1; j++) {
-	// 		printf("%d ", *(permutationArray + i*(vr-1) + j)); 
-	// 	}
-	// 	cout << endl;
-	// }
+	for (int i = 0; i <  numPerm; i++) {
+		for (int j = 0; j < vr-1; j++) {
+			printf("%d ", *(permutationArray + i*(vr-1) + j)); 
+		}
+		cout << endl;
+	}
 
 	t_s = omp_get_wtime();
 	cout<< "Sequential result is: "<< TSP(graph, p) << endl;
@@ -306,10 +309,10 @@ int main()
 	t_p = omp_get_wtime() - t_p;
 	cout << "t_p=" << t_p << endl;
 
-	t_p = omp_get_wtime();	
-	cout<< "Parallel result is: "<< TSP22(graph, p) << endl;	
-	t_p = omp_get_wtime() - t_p;
-	cout << "t_p=" << t_p << endl;
+	// t_p = omp_get_wtime();	
+	// cout<< "Parallel result is: "<< TSP3(graph, p) << endl;	
+	// t_p = omp_get_wtime() - t_p;
+	// cout << "t_p=" << t_p << endl;
 
 	return 0;
 }

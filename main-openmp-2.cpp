@@ -3,7 +3,7 @@
 
 using namespace std;
 
-#define vr 9
+#define vr 13
 
 vector<int> vertices(vr-1);
 long numPerm = 1; 
@@ -42,7 +42,7 @@ void setNumPermutations() {
 	{
 		numPerm *= i;
 	}
-	cout << "Permutations: " << numPerm << endl;
+	// cout << "Permutations: " << numPerm << endl;
 }
 
 void convertNumToFactoradic(unsigned long long int num, int output[]) {
@@ -91,11 +91,11 @@ int getMin(int x, int y) {
 	return y;
 }
 
-int TSP_Parallel(int graph[][vr], int origin) // implement traveling Salesman Problem. 
+void TSP_Parallel(int graph[][vr], int origin, int numThreads) // implement traveling Salesman Problem. 
 {
 	int m_p = INT_MAX; // store minimum weight of a graph 
 
-	omp_set_num_threads(4);
+	omp_set_num_threads(numThreads);
 	#pragma omp parallel shared(graph)
 	{
 		// #pragma omp single
@@ -140,10 +140,10 @@ int TSP_Parallel(int graph[][vr], int origin) // implement traveling Salesman Pr
 		}
 	}
 
-	return m_p;
+	// cout << "Min Path(Parallel) " << m_p << endl;
 }
 
-int TSP_Sequential(int graph[][vr], int origin) // implement traveling Salesman Problem. 
+void TSP_Sequential(int graph[][vr], int origin) // implement traveling Salesman Problem. 
 {
 	int m_p = INT_MAX; // store minimum weight of a graph 
 
@@ -180,7 +180,7 @@ int TSP_Sequential(int graph[][vr], int origin) // implement traveling Salesman 
 
 		m_p = getMin(m_p, cur_pth); // to update the value of minimum weight
 	}
-	return m_p;
+	// cout << "Min Path(Parallel) " << m_p << endl;
 }
 
 
@@ -192,14 +192,14 @@ int main()
 	double t_s, t_p, t_p2;
 
 	setGraph(graph);
-	for (int i = 0; i < vr; ++i)
-	{
-		for (int j = 0; j < vr; ++j)
-		{
-			cout << graph[i][j] << " ";
-		}
-		cout << endl;
-	}
+	// for (int i = 0; i < vr; ++i)
+	// {
+	// 	for (int j = 0; j < vr; ++j)
+	// 	{
+	// 		cout << graph[i][j] << " ";
+	// 	}
+	// 	cout << endl;
+	// }
 
 	for (int i = 1; i < vr; ++i)
 	{
@@ -216,14 +216,18 @@ int main()
 	// }
 
 	t_p = omp_get_wtime();	
-	cout<< "Sequential result is: "<< TSP_Sequential(graph, origin) << endl;	
+	TSP_Sequential(graph, origin);	
 	t_p = omp_get_wtime() - t_p;
-	cout << "t_s=" << t_p << endl;
+	// cout << "t_s=" << t_p << endl;
 
-	t_p = omp_get_wtime();	
-	cout<< "Parallel result is: "<< TSP_Parallel(graph, origin) << endl;	
-	t_p = omp_get_wtime() - t_p;
-	cout << "t_p=" << t_p << endl;
+	for (int numThreads = 2; numThreads < 16; ++numThreads)
+	{
+		t_p2 = omp_get_wtime();	
+		TSP_Parallel(graph, origin, numThreads);	
+		t_p2 = omp_get_wtime() - t_p2;
+		// cout << "t_p=" << t_p2 << endl;
+		cout << vr << " " << numThreads << " " << t_p << " " << t_p2 << endl;
+	}
 
 	return 0;
 }

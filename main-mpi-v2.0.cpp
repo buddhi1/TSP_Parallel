@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#define vr 13
+#define vr 12
 
 vector<int> vertices(vr-1);
 long numPerm = 1; 
@@ -43,7 +43,7 @@ void setNumPermutations() {
 	{
 		numPerm *= i;
 	}
-	cout << "Permutations: " << numPerm << endl;
+	// cout << "Permutations: " << numPerm << endl;
 }
 
 void convertNumToFactoradic(unsigned long long int num, int output[]) {
@@ -96,7 +96,7 @@ int TSP_parallel(int graph[][vr], int origin, int permutationCount, int st)
 {
 	int m_p = INT_MAX; // store minimum weight of a graph 
 
-	omp_set_num_threads(8);
+	omp_set_num_threads(2);
 	#pragma omp parallel shared(graph)
 	{
 		// #pragma omp single
@@ -144,7 +144,7 @@ int TSP_parallel(int graph[][vr], int origin, int permutationCount, int st)
 	return m_p;
 }
 
-int TSP_Sequential(int graph[][vr], int origin) // implement traveling Salesman Problem. 
+void TSP_Sequential(int graph[][vr], int origin) // implement traveling Salesman Problem. 
 {
 	int m_p = INT_MAX; // store minimum weight of a graph 
 
@@ -181,7 +181,7 @@ int TSP_Sequential(int graph[][vr], int origin) // implement traveling Salesman 
 
 		m_p = getMin(m_p, cur_pth); // to update the value of minimum weight
 	}
-	return m_p;
+	// cout << "Min path(Sequential) " << m_p << endl;
 }
 
 // organize block
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
 	int tmpMin, minPath;
 	unsigned long long int idx, tt;
 
-	double time;
+	double time, time2;
 	
 	MPI_Status status;
 
@@ -229,24 +229,24 @@ int main(int argc, char *argv[])
 	{
 		setGraph(graph);
 
-		for (int i = 0; i < vr; ++i)
-		{
-			for (int j = 0; j < vr; ++j)
-			{
-				cout << graph[i][j] << " ";
-			}
-			cout << endl;
-		}
+		// for (int i = 0; i < vr; ++i)
+		// {
+		// 	for (int j = 0; j < vr; ++j)
+		// 	{
+		// 		cout << graph[i][j] << " ";
+		// 	}
+		// 	cout << endl;
+		// }
 
 		setNumPermutations();
 
 		time = MPI_Wtime();
-		cout<< "Sequential result is: "<< TSP_Sequential(graph, origin) << endl;	
+		TSP_Sequential(graph, origin);	
 		time  = MPI_Wtime() - time;
-		cout << "t_s: " << time << endl;
-		cout << endl;
+		// cout << "t_s: " << time << endl;
+		// cout << endl;
 
-		time = MPI_Wtime();		
+		time2 = MPI_Wtime();		
 		blockSize = numPerm / procCount;
 		// broadcast blocks to each processor
 		for (int pid = 1; pid < procCount; ++pid)
@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
     		MPI_Send(graph, vr*vr, MPI_INT, pid,1, MPI_COMM_WORLD);			
 			blockSize = numPerm / procCount;			
 		}
-		cout << "Broadcasting over" << endl;
+		// cout << "Broadcasting over" << endl;
 
 		idx = 0;
 		organizeBlockSize(0, numPerm, procCount, blockSize, idx);
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
 	    // cout << 0 << " -- " << blockSize << " " << 0 << endl;
 	    tmpMin = TSP_parallel(graph, origin, blockSize, idx);
 
-	    cout << "Master computation done!" << endl;
+	    // cout << "Master computation done!" << endl;
 
 	} else {
 	    MPI_Recv(&numPerm, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);	
@@ -289,9 +289,10 @@ int main(int argc, char *argv[])
 
     if (id == 0)
     {
-    	cout << "Parallel Result is: " << minPath << endl;
-		time  = MPI_Wtime() - time;
-		cout << "t_p: " << time << endl;
+    	// cout << "Parallel Result is: " << minPath << endl;
+		time2  = MPI_Wtime() - time2;
+		// cout << "t_p: " << time2 << endl;
+		cout << vr << " " << procCount << " " << time << " " << time2 << endl;
     }
 
 	// cleanup 

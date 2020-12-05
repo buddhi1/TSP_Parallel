@@ -3,7 +3,7 @@
 
 using namespace std;
 
-#define vr 12
+#define vr 13
 
 int *permutationArray; 
 long lastRow = 0;
@@ -179,7 +179,7 @@ int main()
 	setGraph(graph);
 	int origin = 0;
 
-	double t_s, t_p, t_p2;
+	double t_s, t_g, t_p;
 
 	// for (int i = 0; i < vr; ++i)
 	// {
@@ -189,9 +189,9 @@ int main()
 	// 	}
 	// 	cout << endl;
 	// }
-	t_s = omp_get_wtime();		
+	t_g = omp_get_wtime();		
 	generatePermutationArray(origin);
-	t_s = omp_get_wtime() - t_s;
+	t_g = omp_get_wtime() - t_g;
 
 
 	// for (int i = 0; i <  numPerm; i++) {
@@ -201,18 +201,18 @@ int main()
 	// 	cout << endl;
 	// }
 
-	t_p = omp_get_wtime();	
+	t_s = omp_get_wtime();	
 	TSP_Sequential(graph, origin);	
-	t_p = omp_get_wtime() - t_p;
+	t_s = omp_get_wtime() - t_s;
 	// cout << "t_s=" << t_p << endl;
 
 	for (int numThreads = 2 ; numThreads < 16; ++numThreads)
 	{	
-		t_p2 = omp_get_wtime();	
+		t_p = omp_get_wtime();	
 		TSP_Parallel(graph, origin, numThreads);	
-		t_p2 = omp_get_wtime() - t_p2;
+		t_p = omp_get_wtime() - t_p;
 		// cout << "t_p=" << t_p << endl;
-		cout << vr << " " << numThreads << " " << t_s << " " << t_p << " " << t_p2 << endl;
+		cout << vr << " " << numThreads << " " << t_s << " " << t_p << " " << t_g << endl;
 	}
 
 	return 0;

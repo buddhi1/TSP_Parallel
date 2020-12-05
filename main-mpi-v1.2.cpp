@@ -10,6 +10,8 @@ int *permutationArray;
 long lastRow = 0;
 long numPerm = 1; 
 
+int numThreads = 1;
+
 void printArray(int v[], int s) {
 	for (int i = 0; i < s; ++i)
 	{
@@ -115,7 +117,7 @@ int TSP_parallel(int graph[][vr], int origin, int permutationCount) // implement
 {
 	int m_p = INT_MAX; // store minimum weight of a graph 
 
-	omp_set_num_threads(2);
+	omp_set_num_threads(numThreads);
 	#pragma omp parallel shared(graph)
 	{
 		// #pragma omp single
@@ -223,6 +225,8 @@ int main(int argc, char *argv[])
 	MPI_Comm_rank (MPI_COMM_WORLD, &id);
 	MPI_Comm_size (MPI_COMM_WORLD, &procCount);
 
+	numThreads =  atoi(argv[1]);
+
 	if (id == 0)
 	{
 		// for (int i = 0; i < vr; ++i)
@@ -244,9 +248,9 @@ int main(int argc, char *argv[])
 		// 	cout << endl;
 		// }
 
-		// time = MPI_Wtime();
-		// TSP_Sequential(graph, origin);	
-		// time  = MPI_Wtime() - time;
+		time = MPI_Wtime();
+		TSP_Sequential(graph, origin);	
+		time  = MPI_Wtime() - time;
 		// cout << "t_s: " << time << endl;
 		// cout << endl;
 
@@ -295,7 +299,7 @@ int main(int argc, char *argv[])
     	// cout << "Parallel Result is: " << minPath << endl;
 		time2  = MPI_Wtime() - time2;
 		// cout << "t_p: " << time2 << endl;
-		cout << vr << " " << procCount << " " << time3 << " " << time << " " << time2 << endl;
+		cout << vr << " " << procCount << " " << numThreads << " " << time << " " << time2 << " " << time3 << endl;
     }
 
 	// cleanup 

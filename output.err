@@ -1,0 +1,11 @@
+srun: Warning: can't run 2 processes on 8 nodes, setting nnodes to 2
+srun: Warning: can't run 2 processes on 8 nodes, setting nnodes to 2
+srun: Warning: can't run 2 processes on 8 nodes, setting nnodes to 2
+srun: Warning: can't run 2 processes on 8 nodes, setting nnodes to 2
+srun: Warning: can't run 4 processes on 8 nodes, setting nnodes to 4
+slurmstepd: error: *** JOB 7441604 ON cder03 CANCELLED AT 2020-12-04T20:53:16 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 7441604.4 ON cder03 CANCELLED AT 2020-12-04T20:53:16 DUE TO TIME LIMIT ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: got SIGCONT
+srun: forcing job termination
+srun: error: cder05: task 2: Terminated

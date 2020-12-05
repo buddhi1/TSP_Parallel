@@ -215,18 +215,18 @@ int main()
 	// 	cout << endl;
 	// }
 
-	t_p = omp_get_wtime();	
+	t_s = omp_get_wtime();	
 	TSP_Sequential(graph, origin);	
-	t_p = omp_get_wtime() - t_p;
+	t_s = omp_get_wtime() - t_s;
 	// cout << "t_s=" << t_p << endl;
 
 	for (int numThreads = 2; numThreads < 16; ++numThreads)
 	{
-		t_p2 = omp_get_wtime();	
+		t_p = omp_get_wtime();	
 		TSP_Parallel(graph, origin, numThreads);	
-		t_p2 = omp_get_wtime() - t_p2;
+		t_p = omp_get_wtime() - t_p;
 		// cout << "t_p=" << t_p2 << endl;
-		cout << vr << " " << numThreads << " " << t_p << " " << t_p2 << endl;
+		cout << vr << " " << numThreads << " " << t_s << " " << t_p << endl;
 	}
 
 	return 0;
